@@ -22,11 +22,20 @@ It does four things, in order of impact:
 
 ---
 
-## Quick start
+## Prerequisites
+
+- **Python 3.9 or newer** — the only hard requirement. Check with `python3 --version`.
+- That's it. No `pip install`, no virtualenv, no Node, no build step — every tool imports
+  only the Python standard library.
+- **Optional:** an `ANTHROPIC_API_KEY` (from the [Anthropic Console](https://console.anthropic.com/))
+  — needed *only* by `tools/tailor.py`. The other three tools never call an API.
+
+## Clone & run
 
 ```bash
-git clone <this-repo> && cd job-search-toolkit
-python3 --version   # 3.9+; that's the only requirement
+git clone https://github.com/<your-username>/job-search-toolkit.git
+cd job-search-toolkit
+python3 --version          # confirm 3.9+
 
 # 1. Find fresh postings (official APIs only)
 python3 tools/aggregate.py --keywords react node typescript --remote
@@ -38,12 +47,14 @@ python3 tools/md_to_pdf.py examples/resume.md /tmp/resume.pdf
 export ANTHROPIC_API_KEY=sk-ant-...
 python3 tools/tailor.py examples/job_description.txt --resume examples/resume.md
 
-# 4. Build the pipeline dashboard from your tracker CSVs
+# 4. Build the pipeline dashboard from the included sample data
 python3 tracker/dashboard.py --leads --serve
 ```
 
-Replace `examples/resume.md` with your own resume and edit the company slug lists at the
-top of `tools/aggregate.py` to target the companies you care about.
+Everything runs against the bundled fictional sample data out of the box, so you can try each
+tool before adding anything of your own. When you're ready: replace `examples/resume.md` with
+your real resume, edit the company slug lists at the top of `tools/aggregate.py` to target the
+companies you care about, and start logging applications in `tracker/applications.csv`.
 
 ---
 
@@ -74,7 +85,28 @@ otherwise mangle ATS extraction.
 Reads your tracker CSVs and emits a single `dashboard.html` with the data inlined as JSON —
 no server, no dependencies, no network. Status badges, a sortable/filterable table, a
 follow-up-cadence highlighter (overdue rows turn red), per-row fit scores, and a referral
-marker. `--serve` opens it on localhost; otherwise just double-click the file.
+marker.
+
+```bash
+# Build the HTML (writes tracker/dashboard.html); --leads adds a Leads tab
+python3 tracker/dashboard.py --leads
+
+# ...or build AND open it on a local server that picks up CSV edits on refresh
+python3 tracker/dashboard.py --leads --serve     # http://127.0.0.1:8765  (Ctrl-C to stop)
+```
+
+`dashboard.html` is fully standalone, so you can also just open the built file directly:
+
+```bash
+xdg-open tracker/dashboard.html        # Linux
+open tracker/dashboard.html            # macOS
+explorer.exe "$(wslpath -w tracker/dashboard.html)"   # Windows (WSL)
+```
+
+Once it's open, try: click the **score** or **follow-up** column headers to sort; use the
+**quick views** dropdown (`follow-up due`, `has referral / intro`, `scored 4.0+`); and type in
+the **filter** box to search company / role / notes. The generated `dashboard.html` is
+gitignored — it's yours, rebuilt from your CSVs anytime.
 
 ---
 
