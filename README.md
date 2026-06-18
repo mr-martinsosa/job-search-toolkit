@@ -1,34 +1,34 @@
 # job-search-toolkit
 
-A small, dependency-free, ToS-respecting toolkit for running a job search that gets
-*callbacks* — not a mass-apply bot. Every tool is **pure-Python standard library**: no
-`pip install`, no Node, no build step, no account, no scraping. Clone it and run.
+A set of small Python scripts I use to run my own job search. They help with the parts that
+actually move the needle (tailoring a resume, finding real openings, tracking follow-ups)
+rather than blasting out applications. There are no dependencies to install and nothing here
+scrapes a job board.
 
-It does four things, in order of impact:
+The four scripts:
 
-1. **Tailor** your resume to a posting — ethically (`tools/tailor.py`)
-2. **Aggregate** fresh postings from official ATS APIs (`tools/aggregate.py`)
-3. **Export** a clean, ATS-readable PDF from a Markdown resume (`tools/md_to_pdf.py`)
-4. **Track** the whole pipeline in a self-contained HTML dashboard (`tracker/dashboard.py`)
+1. `tools/tailor.py` — tailor your resume to a specific posting
+2. `tools/aggregate.py` — pull fresh openings from official ATS APIs
+3. `tools/md_to_pdf.py` — turn a Markdown resume into an ATS-readable PDF
+4. `tracker/dashboard.py` — build an HTML dashboard of your pipeline
 
-![The pipeline dashboard — status badges, fit scores, follow-up highlighting, and referral markers, generated from your tracker CSVs](docs/dashboard.png)
+![Pipeline dashboard showing status badges, fit scores, follow-up highlighting and referral markers](docs/dashboard.png)
 
-<sub>The dashboard above is generated from the fictional sample data in `tracker/` — run `python3 tracker/dashboard.py --leads --serve` to see it.</sub>
+<sub>That screenshot is generated from the fictional sample data in `tracker/`. Run `python3 tracker/dashboard.py --leads --serve` to see it yourself.</sub>
 
-> Why "no scraping"? LinkedIn / Indeed / Workday prohibit it in their ToS and shadow-filter
-> bots anyway. Every source here is a company's own public job-board API. The whole toolkit
-> is built on the premise that the bottleneck in a job search is **resume credibility +
-> referrals**, not application volume.
-
----
+A note on the "no scraping" choice: LinkedIn, Indeed, and Workday all prohibit it and
+shadow-filter bots anyway, so every source here is a company's own public job-board API. I
+wrote these because the thing holding up a job search is usually the resume and referrals, not
+how many applications you can fire off.
 
 ## Prerequisites
 
-- **Python 3.9 or newer** — the only hard requirement. Check with `python3 --version`.
-- That's it. No `pip install`, no virtualenv, no Node, no build step — every tool imports
-  only the Python standard library.
-- **Optional:** an `ANTHROPIC_API_KEY` (from the [Anthropic Console](https://console.anthropic.com/))
-  — needed *only* by `tools/tailor.py`. The other three tools never call an API.
+You need Python 3.9 or newer. Check with `python3 --version`. There's nothing to `pip install`
+and no virtualenv to set up.
+
+`tools/tailor.py` is the one exception: it calls the Anthropic API, so it needs an
+`ANTHROPIC_API_KEY` (grab one from the [Anthropic Console](https://console.anthropic.com/)).
+The other three scripts don't touch any API.
 
 ## Clone & run
 
@@ -51,51 +51,51 @@ python3 tools/tailor.py examples/job_description.txt --resume examples/resume.md
 python3 tracker/dashboard.py --leads --serve
 ```
 
-Everything runs against the bundled fictional sample data out of the box, so you can try each
-tool before adding anything of your own. When you're ready: replace `examples/resume.md` with
-your real resume, edit the company slug lists at the top of `tools/aggregate.py` to target the
-companies you care about, and start logging applications in `tracker/applications.csv`.
+Everything runs against the bundled sample data, so you can try each script before adding any
+of your own. Once you've had a look, swap `examples/resume.md` for your real resume, edit the
+company slug lists at the top of `tools/aggregate.py`, and start logging applications in
+`tracker/applications.csv`.
 
----
+## The four scripts
 
-## The four tools
+### `tools/tailor.py`
+Reads your resume and a job description and tells you how well they match. It pulls out the
+keywords the posting cares about that your resume already supports but doesn't emphasize,
+rewrites your own bullets to use the posting's wording, and lists the genuine gaps. It won't
+make anything up: if the posting wants something your resume doesn't have, it reports that as a
+gap instead of inventing experience. This is the only script that calls an API; the system
+prompt and resume are cached so repeated runs stay cheap.
 
-### `tools/tailor.py` — ethical ATS optimization
-Scores how well your real resume matches a posting, surfaces the keywords the posting wants
-that you *already* support (but don't emphasize), rewrites **your own** bullets to mirror the
-posting's language, and lists honest gaps. **It will not invent experience** — when the
-posting wants something your resume lacks, it flags it as a gap instead of fabricating it.
-The only tool that calls an API (Anthropic); the static system prompt + resume are
-prompt-cached so repeat runs are cheap.
+### `tools/aggregate.py`
+Pulls openings from Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Workable, and
+RemoteOK, all through each company's own public API or feed. You can filter by keyword,
+location, and remote, and it drops anything above the seniority level you set. Results are
+de-duplicated by URL and can be appended straight to a tracker CSV. To follow a company, add
+its careers-URL slug to the lists at the top of the file.
 
-### `tools/aggregate.py` — official-API job aggregator
-Pulls postings from **Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Workable**, and
-RemoteOK — each a company's own public API or feed. Filters by keyword, location, remote, and
-a seniority/title exclusion list; de-dupes by URL; optionally appends matches to a tracker
-CSV. Add target companies by dropping their careers-URL slug into the lists at the top.
+### `tools/md_to_pdf.py`
+Builds a PDF from Markdown without any library. It writes the raw PDF objects and cross-
+reference table directly, using the standard Helvetica fonts so the text stays selectable.
+That matters because applicant tracking systems read the text layer, so running
+`pdftotext out.pdf -` should give back clean, parseable text. It handles headings, bullets,
+bold and italic, wrapping, and page breaks, and it normalizes smart quotes and em dashes that
+otherwise break text extraction.
 
-### `tools/md_to_pdf.py` — Markdown → ATS-clean PDF
-Writes a valid PDF **by hand** (raw PDF objects + xref table, no library) using the base-14
-Helvetica fonts so the text layer is fully selectable/extractable — `pdftotext out.pdf -`
-returns clean keywords, which is exactly what an ATS parser does. Supports headings, bullets,
-bold/italic, wrapping, and auto page breaks, and normalizes smart-quotes/em-dashes that
-otherwise mangle ATS extraction.
-
-### `tracker/dashboard.py` — self-contained pipeline dashboard
-Reads your tracker CSVs and emits a single `dashboard.html` with the data inlined as JSON —
-no server, no dependencies, no network. Status badges, a sortable/filterable table, a
-follow-up-cadence highlighter (overdue rows turn red), per-row fit scores, and a referral
-marker.
+### `tracker/dashboard.py`
+Reads your tracker CSVs and writes a single `dashboard.html` with the data baked in as JSON, so
+there's no server or network involved. You get status badges, a sortable and filterable table,
+overdue follow-ups highlighted in red, per-row fit scores, and a marker on rows that have a
+referral.
 
 ```bash
 # Build the HTML (writes tracker/dashboard.html); --leads adds a Leads tab
 python3 tracker/dashboard.py --leads
 
-# ...or build AND open it on a local server that picks up CSV edits on refresh
+# ...or build and open it on a local server that picks up CSV edits on refresh
 python3 tracker/dashboard.py --leads --serve     # http://127.0.0.1:8765  (Ctrl-C to stop)
 ```
 
-`dashboard.html` is fully standalone, so you can also just open the built file directly:
+Since `dashboard.html` is self-contained, you can also just open the built file:
 
 ```bash
 xdg-open tracker/dashboard.html        # Linux
@@ -103,34 +103,29 @@ open tracker/dashboard.html            # macOS
 explorer.exe "$(wslpath -w tracker/dashboard.html)"   # Windows (WSL)
 ```
 
-Once it's open, try: click the **score** or **follow-up** column headers to sort; use the
-**quick views** dropdown (`follow-up due`, `has referral / intro`, `scored 4.0+`); and type in
-the **filter** box to search company / role / notes. The generated `dashboard.html` is
-gitignored — it's yours, rebuilt from your CSVs anytime.
-
----
+Once it's open, click the `score` or `follow-up` headers to sort, use the quick-views dropdown
+(`follow-up due`, `has referral / intro`, `scored 4.0+`), and type in the filter box to search
+company, role, or notes. The generated `dashboard.html` is gitignored, since it's rebuilt from
+your CSVs whenever you want.
 
 ## Playbooks (`playbooks/`)
-The toolkit's opinion, in three short docs you apply by hand (no API calls):
-- **`scoring_rubric.md`** — a 1–5 fit score + a ghost-job legitimacy tier, so you spend
-  tailoring/referral effort on the right leads. Scores wire straight into the dashboard.
-- **`outreach_templates.md`** — four referral-outreach archetypes (a referral converts ~10×
-  a cold apply) under LinkedIn's 300-char cap.
-- **`followup_playbook.md`** — what to actually send when the dashboard flags a row overdue,
-  including a banned-phrase list and a stop-after-2 rule.
 
----
+Three short reference docs you apply by hand, no API involved:
 
-## The honest priority order
-1. **Resume fixes** (title framing, gaps, typos) — biggest lever, free, today.
-2. **Referrals / networking** per target company — biggest conversion multiplier.
-3. **Tailoring** per application — beats ATS keyword filters.
-4. **Volume** — last, and only once the above are working.
+- `scoring_rubric.md` — a 1–5 fit score plus a ghost-job legitimacy check, to help decide which
+  leads are worth your tailoring and referral effort. The scores feed straight into the dashboard.
+- `outreach_templates.md` — four templates for referral outreach, kept under LinkedIn's
+  300-character connection-request limit.
+- `followup_playbook.md` — what to send when the dashboard flags a follow-up as overdue,
+  including phrases to avoid and when to stop.
 
-A resume that triggers rejections will trigger them *faster* if you automate. Fix, then scale.
+## How I prioritize
 
-## Requirements
-Python 3.9+. That's it. `tools/tailor.py` additionally needs an `ANTHROPIC_API_KEY`.
+Roughly in this order: fix the resume first, then chase referrals, then tailor each
+application, and only worry about volume once the rest is working. Automating a resume that's
+getting rejected just produces rejections faster, so it's worth getting that right before
+scaling anything up.
 
 ## License
-MIT — see [LICENSE](LICENSE).
+
+MIT, see [LICENSE](LICENSE).
