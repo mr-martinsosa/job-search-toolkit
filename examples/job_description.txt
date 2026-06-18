@@ -1,0 +1,25 @@
+Senior Full-Stack Engineer (AI Products)
+
+We're hiring a senior full-stack engineer to build AI-powered product features end to end.
+You'll work across a React/TypeScript frontend and a Node.js backend, and integrate LLM
+APIs into user-facing workflows.
+
+What you'll do:
+- Build and ship product features in React + TypeScript and Node.js/Express.
+- Integrate LLM APIs (tool use, structured outputs, streaming) into the product.
+- Design REST/GraphQL APIs and own PostgreSQL data models.
+- Collaborate on prompt design, evaluation, and reliability of AI features.
+- Deploy and monitor services (Docker, CI/CD, AWS).
+
+What we're looking for:
+- 4+ years of full-stack experience with React and Node.js.
+- Strong TypeScript.
+- Experience integrating an LLM/AI API into a production app.
+- Comfort owning a feature from API design through deployment.
+
+Nice to have:
+- React Native experience.
+- Familiarity with retrieval/RAG and agentic patterns.
+- Experience with evals/observability for AI features.
+
+Remote (US) · Mid-to-senior level

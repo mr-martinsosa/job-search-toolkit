@@ -1,0 +1,6 @@
+company,role,location,url,status,applied_date,source,notes
+Acme Corp,Senior Full-Stack Engineer,Remote (US),https://example.com/acme/job,applied,2026-06-14,greenhouse,score: 4.6 | strong match
+Globex,Frontend Engineer,New York NY,https://example.com/globex/job,referred,2026-06-09,lever,score: 4.2 | referral: peer (intro via Dana)
+Initech,Software Engineer (AI),Remote,https://example.com/initech/job,screen,2026-06-15,ashby,score: 4.0 | recruiter screen scheduled
+Hooli,Full-Stack Engineer,Remote (US),https://example.com/hooli/job,applied,2026-06-02,greenhouse,score: 3.8 | follow-up overdue
+Umbrella,React Engineer,Brooklyn NY,https://example.com/umbrella/job,rejected,2026-05-20,remoteok,score: 3.5 | role filled

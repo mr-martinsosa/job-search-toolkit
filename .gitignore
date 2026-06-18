@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Generated artifacts
+tracker/dashboard.html
+*.pdf
+
+# Your private data — keep your real search out of git.
+# The committed tracker/*.csv are fictional examples; if you put your real
+# applications here, either uncomment the lines below or keep the repo private.
+# tracker/applications.csv
+# tracker/leads.csv
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
