@@ -11,6 +11,10 @@ It does four things, in order of impact:
 3. **Export** a clean, ATS-readable PDF from a Markdown resume (`tools/md_to_pdf.py`)
 4. **Track** the whole pipeline in a self-contained HTML dashboard (`tracker/dashboard.py`)
 
+![The pipeline dashboard — status badges, fit scores, follow-up highlighting, and referral markers, generated from your tracker CSVs](docs/dashboard.png)
+
+<sub>The dashboard above is generated from the fictional sample data in `tracker/` — run `python3 tracker/dashboard.py --leads --serve` to see it.</sub>
+
 > Why "no scraping"? LinkedIn / Indeed / Workday prohibit it in their ToS and shadow-filter
 > bots anyway. Every source here is a company's own public job-board API. The whole toolkit
 > is built on the premise that the bottleneck in a job search is **resume credibility +
