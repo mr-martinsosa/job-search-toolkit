@@ -33,7 +33,7 @@ The other three scripts don't touch any API.
 ## Clone & run
 
 ```bash
-git clone https://github.com/<your-username>/job-search-toolkit.git
+git clone https://github.com/mr-martinsosa/job-search-toolkit.git
 cd job-search-toolkit
 python3 --version          # confirm 3.9+
 
